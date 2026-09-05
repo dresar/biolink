@@ -1,0 +1,121 @@
+/* Social Icons - Enhanced */
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Platform-specific colors with gradients */
+.instagram { background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D); }
+.facebook { background: linear-gradient(45deg, #1877F2, #0D5FBD); }
+.twitter { background: linear-gradient(45deg, #1DA1F2, #0C85D0); }
+.linkedin { background: linear-gradient(45deg, #0077B5, #00669E); }
+.youtube { background: linear-gradient(45deg, #FF0000, #CC0000); }
+.github { background: linear-gradient(45deg, #333333, #24292E); }
+.tiktok { background: linear-gradient(45deg, #000000, #EE1D52, #69C9D0); }
+.pinterest { background: linear-gradient(45deg, #E60023, #BD081C); }
+.snapchat { background: linear-gradient(45deg, #FFFC00, #F7E800); color: #000; }
+.whatsapp { background: linear-gradient(45deg, #25D366, #128C7E); }
+.telegram { background: linear-gradient(45deg, #0088cc, #0072a6); }
+.reddit { background: linear-gradient(45deg, #FF4500, #D93A00); }
+.discord { background: linear-gradient(45deg, #5865F2, #4752C4); }
+.twitch { background: linear-gradient(45deg, #6441A4, #4B367C); }
+.spotify { background: linear-gradient(45deg, #1DB954, #1AA34A); }
+.medium { background: linear-gradient(45deg, #000000, #292929); }
+.behance { background: linear-gradient(45deg, #1769FF, #0050E6); }
+.dribbble { background: linear-gradient(45deg, #EA4C89, #C32361); }
+.vimeo { background: linear-gradient(45deg, #1AB7EA, #0096C7); }
+.email { background: linear-gradient(45deg, #D44638, #B23121); }
+.website { background: linear-gradient(45deg, #4285F4, #2A75F3); }
+.phone { background: linear-gradient(45deg, #4CAF50, #3D8B40); }
+.location { background: linear-gradient(45deg, #F44336, #D32F2F); }
+
+/* Additional platforms */
+.saweria { background: linear-gradient(45deg, #FF9800, #F57C00); }
+.ko-fi { background: linear-gradient(45deg, #29ABE0, #228FC7); }
+.paypal { background: linear-gradient(45deg, #003087, #001C64); }
+.patreon { background: linear-gradient(45deg, #F96854, #E85842); }
+.fiverr { background: linear-gradient(45deg, #1DBF73, #19A463); }
+.upwork { background: linear-gradient(45deg, #6FDA44, #5DC937); }
+.freelancer { background: linear-gradient(45deg, #29B2FE, #0077C5); }
+.buymeacoffee { background: linear-gradient(45deg, #FFDD00, #FFC400); color: #000; }
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 18px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.social-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.social-icon::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    z-index: -1;
+    transform: scale(0.5);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.social-icon:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), inset 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.social-icon:hover::before {
+    opacity: 1;
+}
+
+.social-icon:hover::after {
+    opacity: 0.6;
+    transform: scale(1) rotate(15deg);
+}
+
+.social-icon i {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.social-icon:hover i {
+    transform: scale(1.2);
+}
+
+.social-description {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icon:hover .social-description {
+    color: rgba(255, 255, 255, 1);
+    transform: translateY(3px);
+}

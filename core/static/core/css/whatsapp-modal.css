@@ -1,0 +1,154 @@
+/**
+ * WhatsApp Modal CSS
+ * Styling untuk modal WhatsApp dan template pesan
+ */
+
+/* Styling untuk modal WhatsApp */
+#whatsappModal .modal-content {
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+#whatsappModal .modal-header {
+    background-color: #25D366;
+    color: white;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 15px 20px;
+}
+
+#whatsappModal .modal-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+#whatsappModal .btn-close {
+    color: white;
+    opacity: 0.8;
+    filter: brightness(0) invert(1);
+}
+
+#whatsappModal .btn-close:hover {
+    opacity: 1;
+}
+
+/* Styling untuk list template */
+#whatsappModal .list-group {
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+#whatsappModal .list-group-item {
+    border-left: none;
+    border-right: none;
+    padding: 12px 15px;
+    transition: all 0.2s ease;
+}
+
+#whatsappModal .list-group-item:first-child {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#whatsappModal .list-group-item:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#whatsappModal .list-group-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+}
+
+#whatsappModal .list-group-item.active {
+    background-color: #e9f7ef;
+    color: #25D366;
+    border-color: #25D366;
+}
+
+/* Styling untuk textarea pesan */
+#whatsappModal .form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+#whatsappModal .form-control {
+    border-radius: 10px;
+    border: 1px solid #ced4da;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+#whatsappModal .form-control:focus {
+    border-color: #25D366;
+    box-shadow: 0 0 0 0.25rem rgba(37, 211, 102, 0.25);
+}
+
+/* Styling untuk tombol */
+#whatsappModal .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#whatsappModal .btn-success {
+    background-color: #25D366;
+    border-color: #25D366;
+    border-radius: 10px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+#whatsappModal .btn-success:hover {
+    background-color: #20bd5a;
+    border-color: #20bd5a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(37, 211, 102, 0.2);
+}
+
+/* Custom scrollbar untuk list template */
+#whatsappModal .list-group::-webkit-scrollbar {
+    width: 8px;
+}
+
+#whatsappModal .list-group::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+#whatsappModal .list-group::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+#whatsappModal .list-group::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Responsif untuk perangkat mobile */
+@media (max-width: 576px) {
+    #whatsappModal .modal-dialog {
+        margin: 10px;
+    }
+    
+    #whatsappModal .modal-content {
+        max-height: calc(100vh - 20px);
+    }
+    
+    #whatsappModal .modal-body {
+        padding: 15px;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+    }
+    
+    #whatsappModal .list-group {
+        max-height: 150px;
+    }
+}

@@ -1,0 +1,374 @@
+{% extends 'core/admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}WhatsApp Templates{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Template Pesan WhatsApp</h1>
+        <button type="button" class="btn btn-sm btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addWhatsAppModal">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Template
+        </button>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 primary-gradient">
+            <h6 class="m-0 font-weight-bold text-white">Daftar Template Pesan WhatsApp</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mobile-responsive-table" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="d-none d-md-table-header-group">
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Template</th>
+                            <th>Pesan</th>
+                            <th>Urutan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for template in templates %}
+                        <tr class="d-block d-md-table-row mb-3 mb-md-0 border rounded">
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">No:</span>
+                                <span>{{ forloop.counter }}</span>
+                            </td>
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">Nama Template:</span>
+                                <span>{{ template.name }}</span>
+                            </td>
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">Pesan:</span>
+                                <span>{{ template.message|truncatechars:50 }}</span>
+                            </td>
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">Urutan:</span>
+                                <span>{{ template.order }}</span>
+                            </td>
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">Status:</span>
+                                <div>
+                                    {% if template.is_active %}
+                                    <span class="badge bg-success">Aktif</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Tidak Aktif</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                                <span class="d-md-none fw-bold">Aksi:</span>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-info edit-btn" data-id="{{ template.id }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger delete-btn" data-id="{{ template.id }}" data-name="{{ template.name }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Belum ada template pesan WhatsApp</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add WhatsApp Template Modal -->
+<div class="modal fade" id="addWhatsAppModal" tabindex="-1" aria-labelledby="addWhatsAppModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addWhatsAppModalLabel">Tambah Template Pesan WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addWhatsAppForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label">Nama Template</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_message" class="form-label">Pesan</label>
+                        {{ form.message }}
+                        <div class="form-text">Gunakan variabel seperti {layanan} yang akan diganti dengan input pengguna.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_order" class="form-label">Urutan</label>
+                        {{ form.order }}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="id_is_active">Aktif</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="saveWhatsAppBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit WhatsApp Template Modal -->
+<div class="modal fade" id="editWhatsAppModal" tabindex="-1" aria-labelledby="editWhatsAppModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editWhatsAppModalLabel">Edit Template Pesan WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editWhatsAppForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit_id">
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Nama Template</label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_message" class="form-label">Pesan</label>
+                        <textarea class="form-control" id="edit_message" name="message" rows="3" required></textarea>
+                        <div class="form-text">Gunakan variabel seperti {layanan} yang akan diganti dengan input pengguna.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_order" class="form-label">Urutan</label>
+                        <input type="number" class="form-control" id="edit_order" name="order" value="0">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="edit_is_active" name="is_active">
+                        <label class="form-check-label" for="edit_is_active">Aktif</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="updateWhatsAppBtn">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete WhatsApp Template Modal -->
+<div class="modal fade" id="deleteWhatsAppModal" tabindex="-1" aria-labelledby="deleteWhatsAppModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteWhatsAppModalLabel">Hapus Template Pesan WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus template pesan "<span id="delete_name"></span>"?</p>
+                <p class="text-danger">Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Hapus</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Fungsi untuk memuat data template WhatsApp
+        function loadWhatsAppTemplates() {
+            $.ajax({
+                url: '{% url "admin_whatsapp_list" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        updateTemplateTable(response.templates);
+                    } else {
+                        showToast('error', 'Gagal memuat data template.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', 'Terjadi kesalahan saat memuat data.');
+                    console.log(error);
+                }
+            });
+        }
+        
+        // Fungsi untuk memperbarui tabel template
+        function updateTemplateTable(templates) {
+            var tableBody = $('#dataTable tbody');
+            tableBody.empty();
+            
+            if (templates.length === 0) {
+                tableBody.append('<tr><td colspan="5" class="text-center">Belum ada template pesan WhatsApp</td></tr>');
+                return;
+            }
+            
+            templates.forEach(function(template) {
+                var statusBadge = template.is_active ? 
+                    '<span class="badge bg-success">Aktif</span>' : 
+                    '<span class="badge bg-secondary">Tidak Aktif</span>';
+                    
+                var row = `
+                    <tr>
+                        <td>${template.name}</td>
+                        <td>${template.message.length > 50 ? template.message.substring(0, 50) + '...' : template.message}</td>
+                        <td>${template.order}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info edit-btn" data-id="${template.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger delete-btn" data-id="${template.id}" data-name="${template.name}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+            
+            // Rebind event handlers for new buttons
+            bindEventHandlers();
+        }
+        
+        // Bind event handlers for dynamic elements
+        function bindEventHandlers() {
+            // Edit button click handler
+            $('.edit-btn').click(function() {
+                var id = $(this).data('id');
+                fetchTemplateData(id);
+            });
+            
+            // Delete button click handler
+            $('.delete-btn').click(function() {
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+                
+                $('#delete_name').text(name);
+                $('#confirmDeleteBtn').data('id', id);
+                $('#deleteWhatsAppModal').modal('show');
+            });
+        }
+        
+        // Add WhatsApp Template
+        $('#saveWhatsAppBtn').click(function() {
+            var formData = new FormData($('#addWhatsAppForm')[0]);
+            
+            $.ajax({
+                url: '{% url "admin_whatsapp_add" %}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#addWhatsAppModal').modal('hide');
+                        $('#addWhatsAppForm')[0].reset();
+                        showToast('success', response.message);
+                        loadWhatsAppTemplates(); // Reload data instead of page refresh
+                    } else {
+                        showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                        console.log(response.errors);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    console.log(error);
+                }
+            });
+        });
+        
+        // Fungsi untuk mengambil data template untuk diedit
+        function fetchTemplateData(id) {
+            $.ajax({
+                url: '/eka/whatsapp/' + id + '/',
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var data = response.data;
+                        $('#edit_id').val(data.id);
+                        $('#edit_name').val(data.name);
+                        $('#edit_message').val(data.message);
+                        $('#edit_order').val(data.order);
+                        $('#edit_is_active').prop('checked', data.is_active);
+                        
+                        $('#editWhatsAppModal').modal('show');
+                    } else {
+                        showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    console.log(error);
+                }
+            });
+        }
+        
+        // Update WhatsApp Template
+        $('#updateWhatsAppBtn').click(function() {
+            var id = $('#edit_id').val();
+            var formData = new FormData($('#editWhatsAppForm')[0]);
+            
+            $.ajax({
+                url: '/eka/whatsapp/' + id + '/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#editWhatsAppModal').modal('hide');
+                        showToast('success', response.message);
+                        loadWhatsAppTemplates(); // Reload data instead of page refresh
+                    } else {
+                        showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                        console.log(response.errors);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    console.log(error);
+                }
+            });
+        });
+        
+        // Confirm Delete
+        $('#confirmDeleteBtn').click(function() {
+            var id = $(this).data('id');
+            
+            $.ajax({
+                url: '/eka/whatsapp/delete/' + id + '/',
+                type: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#deleteWhatsAppModal').modal('hide');
+                        showToast('success', response.message);
+                        loadWhatsAppTemplates(); // Reload data instead of page refresh
+                    } else {
+                        showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showToast('error', 'Terjadi kesalahan. Silakan coba lagi.');
+                    console.log(error);
+                }
+            });
+        });
+        // Inisialisasi - muat data saat halaman dimuat
+        loadWhatsAppTemplates();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,366 @@
+{% extends 'core/admin/base_admin.html' %}
+
+{% block title %}Kelola Produk - Admin Panel{% endblock %}
+
+{% block page_title %}Kelola Produk{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Daftar Produk</span>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            <i class="fas fa-plus"></i> Tambah Produk
+        </button>
+    </div>
+    <div class="card-body">
+        {% if products %}
+        <div class="table-responsive">
+            <table class="table table-hover mobile-responsive-table">
+                <thead class="d-none d-md-table-header-group">
+                    <tr>
+                        <th>No</th>
+                        <th>Gambar</th>
+                        <th>Judul</th>
+                        <th>Deskripsi</th>
+                        <th>Harga</th>
+                        <th>Diskon</th>
+                        <th>Urutan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr class="d-block d-md-table-row mb-3 mb-md-0 border rounded">
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">No:</span>
+                            <span>{{ forloop.counter }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Gambar:</span>
+                            <div>
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.title }}" width="50" height="50" class="rounded">
+                                {% else %}
+                                <span class="badge bg-secondary">No Image</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Judul:</span>
+                            <span>{{ product.title }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Deskripsi:</span>
+                            <span>{{ product.description|truncatechars:50 }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Harga:</span>
+                            <span>{{ product.price }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Diskon:</span>
+                            <span>{{ product.discount_price|default:'-' }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Urutan:</span>
+                            <span>{{ product.order }}</span>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Status:</span>
+                            <div>
+                                {% if product.is_active %}
+                                <span class="badge bg-success">Aktif</span>
+                                {% else %}
+                                <span class="badge bg-danger">Tidak Aktif</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="d-flex d-md-table-cell align-items-center justify-content-between border-bottom-0 border-md-bottom">
+                            <span class="d-md-none fw-bold">Aksi:</span>
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-primary btn-icon" 
+                                        onclick="showProductPreview({{ product.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-info btn-icon" 
+                                        onclick="editItem('{% url 'admin_product_edit' product.id %}', 'editProductModal', 'editProductForm')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger btn-icon"
+                                        onclick="deleteItem('{% url 'admin_product_delete' product.id %}', 'produk')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Belum ada produk yang ditambahkan. Klik tombol "Tambah Produk" untuk menambahkan produk baru.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Tambah Produk Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addProductForm" method="post" action="{% url 'admin_product_add' %}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label">Judul</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Deskripsi</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_image" class="form-label">Gambar Utama</label>
+                        {{ form.image }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_images" class="form-label">Gambar Tambahan (opsional)</label>
+                        <input type="file" name="additional_images" id="id_additional_images" class="form-control" multiple>
+                        <div class="form-text">Anda dapat memilih beberapa gambar sekaligus</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_price" class="form-label">Harga</label>
+                        {{ form.price }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_discount_price" class="form-label">Harga Diskon (opsional)</label>
+                        {{ form.discount_price }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_link" class="form-label">Link Produk (opsional)</label>
+                        {{ form.link }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_link_label" class="form-label">Label Link (opsional)</label>
+                        {{ form.link_label }}
+                        <div class="form-text">Contoh: Link Demo, Link Lainnya, dll.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_link" class="form-label">Link Tambahan (opsional)</label>
+                        {{ form.additional_link }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_link_label" class="form-label">Label Link Tambahan (opsional)</label>
+                        {{ form.additional_link_label }}
+                        <div class="form-text">Contoh: Link Demo, Link Lainnya, dll.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_order" class="form-label">Urutan</label>
+                        {{ form.order }}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="id_is_active">Aktif</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Edit Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editProductForm" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label">Judul</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Deskripsi</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_image" class="form-label">Gambar Utama</label>
+                        {{ form.image }}
+                        <div id="current-image" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_images" class="form-label">Gambar Tambahan (opsional)</label>
+                        <input type="file" name="additional_images" id="id_additional_images" class="form-control" multiple>
+                        <div class="form-text">Anda dapat memilih beberapa gambar sekaligus</div>
+                        <div id="current-additional-images" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_price" class="form-label">Harga</label>
+                        {{ form.price }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_discount_price" class="form-label">Harga Diskon (opsional)</label>
+                        {{ form.discount_price }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_link" class="form-label">Link Produk (opsional)</label>
+                        {{ form.link }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_link_label" class="form-label">Label Link (opsional)</label>
+                        {{ form.link_label }}
+                        <div class="form-text">Contoh: Link Demo, Link Lainnya, dll.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_link" class="form-label">Link Tambahan (opsional)</label>
+                        {{ form.additional_link }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_additional_link_label" class="form-label">Label Link Tambahan (opsional)</label>
+                        {{ form.additional_link_label }}
+                        <div class="form-text">Contoh: Link Demo, Link Lainnya, dll.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_order" class="form-label">Urutan</label>
+                        {{ form.order }}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="id_is_active">Aktif</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include 'core/admin/preview_modals.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle add product form submission
+        const addProductForm = document.getElementById('addProductForm');
+        addProductForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmit(this, "{% url 'admin_product_add' %}", 'addProductModal');
+        });
+        
+        // Handle edit product form submission
+        const editProductForm = document.getElementById('editProductForm');
+        editProductForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmit(this, this.action, 'editProductModal');
+        });
+        
+        // Reset form when modal is closed
+        const addModal = document.getElementById('addProductModal');
+        addModal.addEventListener('hidden.bs.modal', function() {
+            addProductForm.reset();
+            const invalidFeedbacks = addProductForm.querySelectorAll('.invalid-feedback');
+            invalidFeedbacks.forEach(feedback => feedback.remove());
+            const invalidInputs = addProductForm.querySelectorAll('.is-invalid');
+            invalidInputs.forEach(input => input.classList.remove('is-invalid'));
+        });
+        
+        const editModal = document.getElementById('editProductModal');
+        editModal.addEventListener('hidden.bs.modal', function() {
+            const invalidFeedbacks = editProductForm.querySelectorAll('.invalid-feedback');
+            invalidFeedbacks.forEach(feedback => feedback.remove());
+            const invalidInputs = editProductForm.querySelectorAll('.is-invalid');
+            invalidInputs.forEach(input => input.classList.remove('is-invalid'));
+            document.getElementById('current-image').innerHTML = '';
+            document.getElementById('current-additional-images').innerHTML = '';
+        });
+    });
+    
+    // Show current image in edit modal
+    function editItem(url, modalId, formId) {
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const form = document.getElementById(formId);
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                
+                // Fill form with data
+                Object.keys(data.data).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) {
+                        if (input.type === 'checkbox') {
+                            input.checked = data.data[key];
+                        } else {
+                            input.value = data.data[key] || '';
+                        }
+                    }
+                });
+                
+                // Show current image if exists
+                const currentImageDiv = document.getElementById('current-image');
+                if (data.data.image_url) {
+                    currentImageDiv.innerHTML = `
+                        <p>Gambar utama saat ini:</p>
+                        <img src="${data.data.image_url}" alt="Current Image" class="img-thumbnail" style="max-width: 150px;">
+                    `;
+                } else {
+                    currentImageDiv.innerHTML = '<p>Tidak ada gambar utama</p>';
+                }
+                
+                // Show current additional images if exists
+                const currentAdditionalImagesDiv = document.getElementById('current-additional-images');
+                if (data.data.additional_images && data.data.additional_images.length > 0) {
+                    let imagesHtml = '<p>Gambar tambahan saat ini:</p><div class="d-flex flex-wrap gap-2">';
+                    data.data.additional_images.forEach(img => {
+                        imagesHtml += `
+                            <div class="position-relative">
+                                <img src="${img.url}" alt="Additional Image" class="img-thumbnail" style="max-width: 100px;">
+                                <span class="badge bg-secondary position-absolute top-0 end-0">Urutan: ${img.order}</span>
+                            </div>
+                        `;
+                    });
+                    imagesHtml += '</div>';
+                    currentAdditionalImagesDiv.innerHTML = imagesHtml;
+                } else {
+                    currentAdditionalImagesDiv.innerHTML = '<p>Tidak ada gambar tambahan</p>';
+                }
+                
+                // Update form action URL
+                form.action = url;
+                
+                // Show modal
+                modal.show();
+            } else {
+                showAlert('Terjadi kesalahan saat mengambil data.', 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Terjadi kesalahan pada server.', 'danger');
+        });
+    }
+</script>
+{% endblock %}

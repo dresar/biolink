@@ -1,0 +1,321 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ site_settings.site_title|default:"Bio Link" }}{% endblock %}
+
+{% block meta_description %}{{ site_settings.site_description|default:"" }}{% endblock %}
+{% block meta_keywords %}{{ site_settings.site_keywords|default:"" }}{% endblock %}
+{% block meta_favicon %}{{ site_settings.site_favicon.url|default:"" }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/social-icons.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/product-detail-modal.css' %}">
+<link rel="stylesheet" href="{% static 'core/css/whatsapp-modal.css' %}">
+<style>
+    /* Tambahan CSS untuk responsivitas mobile */
+    @media (max-width: 576px) {
+        .bio-container {
+            padding: 1rem;
+        }
+        
+        .bio-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem 1rem;
+        }
+        
+        .profile-image-container {
+            margin-bottom: 1rem;
+        }
+        
+        .bio-name {
+            font-size: 1.8rem;
+        }
+        
+        .bio-title {
+            font-size: 1rem;
+        }
+        
+        .bio-description {
+            font-size: 0.9rem;
+        }
+        
+        .social-links {
+            justify-content: center;
+        }
+        
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+        
+        .whatsapp-button {
+            width: 100%;
+            text-align: center;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .service-card, .product-card {
+            height: auto !important;
+            padding: 1rem;
+        }
+        
+        .service-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+        
+        .service-card h3 {
+            font-size: 1rem;
+        }
+        
+        .service-card p {
+            font-size: 0.8rem;
+        }
+        
+        .floating-whatsapp {
+            bottom: 1rem;
+            right: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bio-container">
+    <div class="bio-header" data-aos="fade-up">
+        <div class="profile-image-container">
+            {% if site_settings.admin_photo %}
+            <img src="{{ site_settings.admin_photo.url }}" alt="{{ site_settings.admin_name }}" class="profile-image" loading="eager">
+            {% else %}
+            <img src="{% static 'core/images/profile.jpg' %}" alt="Profile Image" class="profile-image" loading="eager">
+            {% endif %}
+        </div>
+        <div class="bio-info">
+            <h1 class="bio-name">{{ site_settings.admin_name|default:"Codingin" }}</h1>
+            <p class="bio-title">{{ site_settings.admin_title|default:"Fullstack Developer & Content Creator" }}</p>
+            <p class="bio-description">{{ site_settings.admin_description|default:"Membantu bisnis dan individu membangun kehadiran online yang kuat." }}</p>
+        </div>
+    </div>
+    
+    <div class="whatsapp-button-container">
+        <a href="javascript:void(0);" class="whatsapp-button" id="whatsappBtn">
+            <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
+        </a>
+    </div>
+    
+    <div class="social-links">
+        {% for social in socials %}
+        {% if social.is_active %}
+        <a href="{{ social.link }}" class="social-icon {{ social.platform }}" target="_blank" data-aos="zoom-in" data-aos-delay="{{ forloop.counter|add:"100" }}" {% if social.description %}title="{{ social.description }}"{% endif %} aria-label="{{ social.platform }}">
+            <i class="{{ social.icon }}"></i>
+            {% if social.description %}
+            {% endif %}
+        </a>
+        {% endif %}
+        {% endfor %}
+    </div>
+    
+    <div class="row content-section">
+        <div class="col-12">
+            <h2 class="section-title" data-aos="fade-right">Layanan</h2>
+        </div>
+        <div class="services-grid">
+            {% for service in services %}
+            {% if service.is_active %}
+            <div class="service-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:"100" }}">
+                {% if service.link %}
+                <a href="{{ service.link }}" class="service-link" target="_blank" aria-label="{{ service.title }}">
+                {% endif %}
+                <div class="service-card {{ service.color }}" {% if service.gradient_color %}style="{% if service.gradient_type == 'linear' %}background: linear-gradient({{ service.gradient_direction }}, {{ service.color }}, {{ service.gradient_color }});{% else %}background: radial-gradient(circle, {{ service.color }}, {{ service.gradient_color }});{% endif %}"{% endif %}>
+                    <div class="service-card-inner">
+                        <div class="service-icon">
+                            <img src="{{ service.icon.url }}" alt="{{ service.title }}" loading="lazy">
+                        </div>
+                        <div class="service-content">
+                            <h3>{{ service.title }}</h3>
+                            <p>{{ service.description }}</p>
+                            {% if service.link %}
+                            <div class="service-link-indicator">
+                                <i class="fas fa-external-link-alt"></i> Buka Link
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% if service.link %}
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="row content-section">
+        <div class="col-12">
+            <h2 class="section-title" data-aos="fade-right">Produk</h2>
+        </div>
+        <div class="products-grid">
+            {% for product in products %}
+            {% if product.is_active %}
+            <div class="product-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:"100" }}">
+                <div class="product-card" onclick="showProductDetailModal({{ product.id }})">
+                    <div class="product-image">
+                        <img src="{{ product.image.url }}" alt="{{ product.title }}" loading="lazy">
+                        {% if product.discount_price %}
+                        <div class="discount-badge">Sale</div>
+                        {% endif %}
+                    </div>
+                    <div class="product-content">
+                        <h3>{{ product.title }}</h3>
+                        <div class="product-price">
+                            {% if product.discount_price %}
+                            <span class="original-price">Rp {{ product.price }}</span>
+                            <span class="discount-price">Rp {{ product.discount_price }}</span>
+                            {% else %}
+                            <span class="price">Rp {{ product.price }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-links">
+                            <div class="product-link-indicator">
+                                <i class="fas fa-external-link-alt me-2"></i> lihat detail tombol link
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <footer class="bio-footer" data-aos="fade-up">
+        <p>{{ site_settings.footer_text|default:"&copy; "|safe }}{% now "Y" %}{% if not "&copy;" in site_settings.footer_text %} {{ site_settings.admin_name|default:"Codingin" }}. All rights reserved.{% endif %}</p>
+        
+        {% if site_settings.footer_show_social %}
+        <div class="footer-social-links">
+            {% for social in socials %}
+            {% if social.is_active %}
+            <a href="{{ social.link }}" class="social-icon {{ social.platform }}" target="_blank" aria-label="{{ social.platform }}">
+                <i class="{{ social.icon }}"></i>
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </footer>
+    
+    <!-- Product Detail Modal -->
+    <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productDetailModalLabel">Detail Produk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="product-detail">
+                        <!-- Swiper slider for product images -->
+                        <div class="product-image-slider swiper">
+                            <div class="swiper-wrapper" id="product-images-container">
+                                <!-- Main image as first slide -->
+                                <div class="swiper-slide">
+                                    <div class="product-detail-image">
+                                        <img id="detail-product-image" src="" alt="Product Image" class="img-zoomable">
+                                    </div>
+                                </div>
+                                <!-- Additional images will be added here by JavaScript -->
+                            </div>
+                            <!-- Add Pagination -->
+                            <div class="swiper-pagination"></div>
+                            <!-- Add Navigation -->
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+                        
+                        <div class="product-detail-content">
+                            <h3 id="detail-product-title"></h3>
+                            <p id="detail-product-description"></p>
+                            <div class="product-detail-price">
+                                <span id="detail-product-price"></span>
+                                <span id="detail-product-discount" class="discount"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-detail-links mt-4">
+                        <div class="row">
+                            <div class="col-6" id="detail-product-link-container">
+                                <a id="detail-product-link" href="#" target="_blank" class="btn btn-primary w-100">
+                                    <i class="fas fa-external-link-alt me-2"></i> <span id="detail-product-link-text">Lihat Product</span>
+                                </a>
+                            </div>
+                            <div class="col-6" id="detail-product-additional-link-container">
+                                <a id="detail-product-additional-link" href="#" target="_blank" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-external-link-alt me-2"></i> <span id="detail-product-additional-link-text">Link Tambahan</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="floating-buttons">
+    <div class="floating-up">
+        <a href="#top" id="floatingUpBtn" aria-label="Kembali ke atas">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+    </div>
+    <div class="floating-whatsapp">
+        <a href="javascript:void(0);" id="floatingWhatsappBtn" aria-label="Hubungi via WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+</div>
+
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="whatsappModalLabel">Kirim Pesan WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Pilih template pesan:</p>
+                <div class="list-group mb-3">
+                    {% for template in whatsapp_templates %}
+                    <a href="javascript:void(0);" class="list-group-item list-group-item-action template-item" data-message="{{ template.message }}">
+                        {{ template.name }}
+                    </a>
+                    {% empty %}
+                    <div class="list-group-item">Tidak ada template pesan tersedia</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="whatsappMessage" class="form-label">Pesan:</label>
+                    <textarea class="form-control" id="whatsappMessage" rows="4" placeholder="Tulis pesan Anda di sini..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="sendWhatsappBtn" data-whatsapp="{{ site_settings.admin_whatsapp|default:"628xxxxxxxxxx" }}">Kirim Pesan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'core/js/whatsapp-float.js' %}"></script>
+<script src="{% static 'core/js/product-detail-modal.js' %}"></script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends 'core/admin/base_admin.html' %}
+
+{% block title %}Pengaturan - Admin Panel{% endblock %}
+
+{% block page_title %}Pengaturan Situs{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Pengaturan Situs</h5>
+            </div>
+            <div class="card-body">
+                <form id="settingsForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                                <i class="fas fa-user"></i> Profil Admin
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="footer-tab" data-bs-toggle="tab" data-bs-target="#footer" type="button" role="tab" aria-controls="footer" aria-selected="false">
+                                <i class="fas fa-shoe-prints"></i> Footer
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="site-tab" data-bs-toggle="tab" data-bs-target="#site" type="button" role="tab" aria-controls="site" aria-selected="false">
+                                <i class="fas fa-globe"></i> Situs
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="admin-accounts-tab" data-bs-toggle="tab" data-bs-target="#admin-accounts" type="button" role="tab" aria-controls="admin-accounts" aria-selected="false">
+                                <i class="fas fa-users-cog"></i> Akun Admin
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="settingsTabsContent">
+                        <!-- Profil Admin Tab -->
+                        <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="text-center mb-4">
+                                        {% if settings.admin_photo %}
+                                            <img src="{{ settings.admin_photo.url }}" alt="Admin Photo" class="img-fluid rounded-circle mb-3" style="max-width: 150px; max-height: 150px;">
+                                        {% else %}
+                                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px;">
+                                                <i class="fas fa-user fa-4x text-secondary"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div class="mb-3">
+                                            <label for="id_admin_photo" class="form-label">Foto Profil</label>
+                                            {{ form.admin_photo }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="id_admin_name" class="form-label">Nama Admin</label>
+                                        {{ form.admin_name }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="id_admin_title" class="form-label">Jabatan/Deskripsi Singkat</label>
+                                        {{ form.admin_title }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="id_admin_description" class="form-label">Deskripsi</label>
+                                        {{ form.admin_description }}
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="id_admin_whatsapp" class="form-label">Nomor WhatsApp</label>
+                                        {{ form.admin_whatsapp }}
+                                        <div class="form-text">Format: 628xxxxxxxxxx (tanpa tanda + atau spasi)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer Tab -->
+                        <div class="tab-pane fade" id="footer" role="tabpanel" aria-labelledby="footer-tab">
+                            <div class="mb-3">
+                                <label for="id_footer_text" class="form-label">Teks Footer</label>
+                                {{ form.footer_text }}
+                            </div>
+                            <div class="mb-3 form-check">
+                                {{ form.footer_show_social }}
+                                <label class="form-check-label" for="id_footer_show_social">Tampilkan ikon media sosial di footer</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Site Tab -->
+                        <div class="tab-pane fade" id="site" role="tabpanel" aria-labelledby="site-tab">
+                            <div class="mb-3">
+                                <label for="id_site_title" class="form-label">Judul Situs</label>
+                                {{ form.site_title }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_site_description" class="form-label">Deskripsi Situs</label>
+                                {{ form.site_description }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_site_keywords" class="form-label">Kata Kunci (SEO)</label>
+                                {{ form.site_keywords }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_site_favicon" class="form-label">Favicon</label>
+                                {{ form.site_favicon }}
+                                {% if settings.site_favicon %}
+                                    <div class="mt-2">
+                                        <img src="{{ settings.site_favicon.url }}" alt="Current Favicon" width="32" height="32">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Accounts Tab -->
+                        <div class="tab-pane fade" id="admin-accounts" role="tabpanel" aria-labelledby="admin-accounts-tab">
+                            <div class="row">
+                                <!-- Daftar Admin -->
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header bg-dark text-white">
+                                            <h5 class="card-title mb-0"><i class="fas fa-users-cog me-2"></i>Daftar Admin</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Username</th>
+                                                            <th>Email</th>
+                                                            <th>Status</th>
+                                                            <th>Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for admin in admins %}
+                                                        <tr>
+                                                            <td>{{ admin.username }}</td>
+                                                            <td>{{ admin.email|default:'-' }}</td>
+                                                            <td>
+                                                                {% if admin.is_superuser %}
+                                                                <span class="badge bg-danger">Superuser</span>
+                                                                {% else %}
+                                                                <span class="badge bg-primary">Admin</span>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {% if admin.id != request.user.id %}
+                                                                <a href="{% url 'admin_delete' admin.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus admin {{ admin.username }}?')">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </a>
+                                                                {% else %}
+                                                                <span class="text-muted"><i class="fas fa-user-check"></i> Akun Aktif</span>
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        {% empty %}
+                                                        <tr>
+                                                            <td colspan="4" class="text-center">Tidak ada data admin</td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Form Tambah Admin -->
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-header bg-dark text-white">
+                                            <h5 class="card-title mb-0"><i class="fas fa-user-plus me-2"></i>Tambah Admin</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <form action="{% url 'admin_add' %}" method="post">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+                                                    <label for="username" class="form-label">Username</label>
+                                                    <input type="text" class="form-control" id="username" name="username" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="email" class="form-label">Email (opsional)</label>
+                                                    <input type="email" class="form-control" id="email" name="email">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="password" class="form-label">Password</label>
+                                                    <input type="password" class="form-control" id="password" name="password" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary w-100">
+                                                    <i class="fas fa-user-plus me-2"></i>Tambah Admin
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Pengaturan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Settings Form Submit
+        $('#settingsForm').submit(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: '{% url "admin_settings_update" %}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        showAlert('success', response.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showAlert('danger', 'Error: ' + JSON.stringify(response.errors));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Error: ' + error);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

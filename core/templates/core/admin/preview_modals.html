@@ -1,0 +1,108 @@
+<!-- Service Preview Modal -->
+<div class="modal fade" id="servicePreviewModal" tabindex="-1" aria-labelledby="servicePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="servicePreviewModalLabel">Preview Layanan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="service-preview">
+                    <div class="service-preview-icon">
+                        <i id="preview-service-icon" class=""></i>
+                    </div>
+                    <div class="service-preview-content">
+                        <h3 id="preview-service-title"></h3>
+                        <p id="preview-service-description"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Preview Modal -->
+<div class="modal fade" id="productPreviewModal" tabindex="-1" aria-labelledby="productPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productPreviewModalLabel">Preview Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="product-preview">
+                    <!-- Swiper slider for product images -->
+                    <div class="product-image-slider swiper">
+                        <div class="swiper-wrapper" id="preview-product-images-container">
+                            <!-- Main image as first slide -->
+                            <div class="swiper-slide">
+                                <div class="product-preview-image">
+                                    <img id="preview-product-image" src="" alt="Product Image" class="img-zoomable">
+                                </div>
+                            </div>
+                            <!-- Additional images will be added here by JavaScript -->
+                        </div>
+                        <!-- Add Pagination -->
+                        <div class="swiper-pagination"></div>
+                        <!-- Add Navigation -->
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                    <div class="product-preview-content">
+                        <h3 id="preview-product-title"></h3>
+                        <p id="preview-product-description"></p>
+                        <div class="product-preview-price">
+                            <span id="preview-product-price"></span>
+                            <span id="preview-product-discount" class="discount"></span>
+                        </div>
+                        <div class="product-preview-links mt-3">
+                            <div id="preview-product-link-container" class="mb-2">
+                                <a id="preview-product-link" href="#" target="_blank" class="btn btn-primary w-100">
+                                    <i class="fas fa-external-link-alt"></i> <span id="preview-product-link-label">Link Produk</span>
+                                </a>
+                            </div>
+                            <div id="preview-product-additional-link-container">
+                                <a id="preview-product-additional-link" href="#" target="_blank" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-external-link-alt"></i> <span id="preview-product-additional-link-label">Link Tambahan</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Social Media Preview Modal -->
+<div class="modal fade" id="socialPreviewModal" tabindex="-1" aria-labelledby="socialPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="socialPreviewModalLabel">Preview Media Sosial</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="social-preview">
+                    <div class="social-preview-icon">
+                        <i id="preview-social-icon" class=""></i>
+                    </div>
+                    <div class="social-preview-content">
+                        <h3 id="preview-social-platform"></h3>
+                        <p id="preview-social-username"></p>
+                        <a id="preview-social-url" href="#" target="_blank">Kunjungi</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>

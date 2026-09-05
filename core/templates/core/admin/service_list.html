@@ -1,0 +1,412 @@
+{% extends 'core/admin/base_admin.html' %}
+
+{% block title %}Kelola Layanan - Admin Panel{% endblock %}
+
+{% block page_title %}Kelola Layanan{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Daftar Layanan</span>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+            <i class="fas fa-plus"></i> Tambah Layanan
+        </button>
+    </div>
+    <div class="card-body">
+        {% if services %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="d-none d-md-table-header-group">
+                    <tr>
+                        <th>Icon</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Color</th>
+                        <th>Order</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr class="d-block d-md-table-row mb-3 mb-md-0">
+                        <td class="d-flex d-md-table-cell align-items-center border-bottom-0 border-md-bottom">
+                            <div class="d-md-none fw-bold me-2">Icon:</div>
+                            {% if service.icon %}
+                            <img src="{{ service.icon.url }}" alt="{{ service.title }}" width="40" height="40" class="rounded">
+                            {% else %}
+                            No Icon
+                            {% endif %}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold">Title:</div>
+                            {{ service.title }}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold">Description:</div>
+                            {{ service.description|truncatechars:30 }}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold">Color:</div>
+                            {% if service.gradient_color %}
+                                <span class="badge" style="background: {% if service.gradient_type == 'linear' %}linear-gradient({{ service.gradient_direction }}, {{ service.color }}, {{ service.gradient_color }}){% else %}radial-gradient(circle, {{ service.color }}, {{ service.gradient_color }}){% endif %}; padding: 8px 12px;">Gradasi</span>
+                            {% else %}
+                                <span class="badge" style="background-color: {{ service.color }}; padding: 8px 12px;">{{ service.color }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold">Order:</div>
+                            {{ service.order }}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold">Status:</div>
+                            {% if service.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-danger">Inactive</span>{% endif %}
+                        </td>
+                        <td class="d-block d-md-table-cell">
+                            <div class="d-md-none fw-bold mb-2">Actions:</div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-primary btn-icon" 
+                                        onclick="showServicePreview({{ service.id }})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-info btn-icon edit-btn" 
+                                        data-id="{{ service.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger btn-icon"
+                                        onclick="deleteItem('{% url 'admin_service_delete' service.id %}', 'layanan')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No services found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            Belum ada layanan yang ditambahkan. Klik tombol "Tambah Layanan" untuk menambahkan layanan baru.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Add Service -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addServiceModalLabel">Add Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addServiceForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="add-title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="add-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="add-description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-icon" class="form-label">Icon</label>
+                        <input type="file" class="form-control" id="add-icon" name="icon" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-link" class="form-label">Link (opsional)</label>
+                        <input type="url" class="form-control" id="add-link" name="link" placeholder="https://example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-color" class="form-label">Warna Utama</label>
+                        <input type="color" class="form-control color-picker" id="add-color" name="color" value="#4a6cf7">
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-gradient-color" class="form-label">Warna Gradasi (opsional)</label>
+                        <input type="color" class="form-control color-picker" id="add-gradient-color" name="gradient_color" value="">
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-gradient-type" class="form-label">Tipe Gradasi</label>
+                        <select class="form-control" id="add-gradient-type" name="gradient_type">
+                            <option value="linear">Linear Gradient</option>
+                            <option value="radial">Radial Gradient</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-gradient-direction" class="form-label">Arah Gradasi</label>
+                        <select class="form-control" id="add-gradient-direction" name="gradient_direction">
+                            <option value="to right">Kanan</option>
+                            <option value="to left">Kiri</option>
+                            <option value="to bottom">Bawah</option>
+                            <option value="to top">Atas</option>
+                            <option value="to bottom right">Kanan Bawah</option>
+                            <option value="to bottom left">Kiri Bawah</option>
+                            <option value="to top right">Kanan Atas</option>
+                            <option value="to top left">Kiri Atas</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-order" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="add-order" name="order" value="0">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="add-is-active" name="is_active" checked>
+                        <label class="form-check-label" for="add-is-active">Active</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="addServiceForm" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editServiceModalLabel">Edit Service</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editServiceForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit-service-id" name="id">
+                    <div class="mb-3">
+                        <label for="edit-title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="edit-title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit-description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-icon" class="form-label">Icon</label>
+                        <input type="file" class="form-control" id="edit-icon" name="icon">
+                        <div id="current-icon" class="mt-2"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-link" class="form-label">Link (opsional)</label>
+                        <input type="url" class="form-control" id="edit-link" name="link" placeholder="https://example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-color" class="form-label">Warna Utama</label>
+                        <input type="color" class="form-control color-picker" id="edit-color" name="color">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-gradient-color" class="form-label">Warna Gradasi (opsional)</label>
+                        <input type="color" class="form-control color-picker" id="edit-gradient-color" name="gradient_color">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-gradient-type" class="form-label">Tipe Gradasi</label>
+                        <select class="form-control" id="edit-gradient-type" name="gradient_type">
+                            <option value="linear">Linear Gradient</option>
+                            <option value="radial">Radial Gradient</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-gradient-direction" class="form-label">Arah Gradasi</label>
+                        <select class="form-control" id="edit-gradient-direction" name="gradient_direction">
+                            <option value="to right">Kanan</option>
+                            <option value="to left">Kiri</option>
+                            <option value="to bottom">Bawah</option>
+                            <option value="to top">Atas</option>
+                            <option value="to bottom right">Kanan Bawah</option>
+                            <option value="to bottom left">Kiri Bawah</option>
+                            <option value="to top right">Kanan Atas</option>
+                            <option value="to top left">Kiri Atas</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-order" class="form-label">Order</label>
+                        <input type="number" class="form-control" id="edit-order" name="order" value="0">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="edit-is-active" name="is_active">
+                        <label class="form-check-label" for="edit-is-active">Active</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editServiceSubmit">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'core/admin/preview_modals.html' %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Add Service Form Submit
+        $('#addServiceForm').submit(function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: '{% url "admin_service_add" %}',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#addServiceModal').modal('hide');
+                        showAlert('success', response.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        let errorMsg = 'Error: ';
+                        if (response.errors) {
+                            // Format error messages for better readability
+                            for (const field in response.errors) {
+                                errorMsg += `\n${field}: ${response.errors[field].join(', ')}`;
+                            }
+                        } else if (response.message) {
+                            errorMsg += response.message;
+                        }
+                        showAlert('danger', errorMsg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Error: ' + error);
+                }
+            });
+        });
+        
+        // Edit Service Button Click
+        $('.edit-btn').click(function() {
+            var serviceId = $(this).data('id');
+            
+            $.ajax({
+                url: '{% url "admin_service_edit" 0 %}'.replace('0', serviceId),
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'success') {
+                        var data = response.data;
+                        $('#edit-service-id').val(data.id);
+                        $('#edit-title').val(data.title);
+                        $('#edit-description').val(data.description);
+                        $('#edit-link').val(data.link || '');
+                        // Ensure color is in valid hex format (#rrggbb)
+                        $('#edit-color').val(data.color && data.color.startsWith('#') ? data.color : '#000000');
+                        // Ensure gradient color is in valid hex format or empty
+                        $('#edit-gradient-color').val(data.gradient_color && data.gradient_color.startsWith('#') ? data.gradient_color : '');
+                        $('#edit-gradient-type').val(data.gradient_type || 'linear');
+                        $('#edit-gradient-direction').val(data.gradient_direction || 'to right');
+                        $('#edit-order').val(data.order || 0);
+                        $('#edit-is-active').prop('checked', data.is_active);
+                        
+                        if (data.icon_url) {
+                            $('#current-icon').html('<img src="' + data.icon_url + '" alt="Current Icon" width="100" class="img-thumbnail">');
+                        } else {
+                            $('#current-icon').html('No icon');
+                        }
+                        
+                        $('#editServiceModal').modal('show');
+                    } else {
+                        showAlert('danger', 'Error: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Error: ' + error);
+                }
+            });
+        });
+        
+        // Edit Service Form Submit
+        $('#editServiceSubmit').click(function() {
+            var serviceId = $('#edit-service-id').val();
+            if (!serviceId) {
+                showAlert('danger', 'ID layanan tidak ditemukan');
+                return;
+            }
+            
+            var formData = new FormData($('#editServiceForm')[0]);
+            
+            // Ensure CSRF token is included
+            if (!formData.has('csrfmiddlewaretoken')) {
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            }
+            
+            // Log form data for debugging
+            console.log('Service ID:', serviceId);
+            
+            $.ajax({
+                url: '{% url "admin_service_edit" 0 %}'.replace('0', serviceId),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#editServiceModal').modal('hide');
+                        showAlert('success', response.message);
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        // Format error messages for better readability
+                        var errorMsg = '';
+                        if (response.errors) {
+                            for (var field in response.errors) {
+                                errorMsg += field + ': ' + response.errors[field].join(', ') + '<br>';
+                            }
+                        } else if (response.message) {
+                            errorMsg = response.message;
+                        } else {
+                            errorMsg = 'Unknown error occurred';
+                        }
+                        showAlert('danger', errorMsg);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showAlert('danger', 'Error: ' + error);
+                }
+            });
+        });
+        
+        // Delete Service Button Click
+        $('.delete-btn').click(function() {
+            var serviceId = $(this).data('id');
+            var serviceTitle = $(this).data('title');
+            
+            if (confirm('Are you sure you want to delete "' + serviceTitle + '"?')) {
+                $.ajax({
+                    url: '{% url "admin_service_delete" 0 %}'.replace('0', serviceId),
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            showAlert('success', response.message);
+                            setTimeout(function() {
+                                location.reload();
+                            }, 1500);
+                        } else {
+                            showAlert('danger', 'Error: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showAlert('danger', 'Error: ' + error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

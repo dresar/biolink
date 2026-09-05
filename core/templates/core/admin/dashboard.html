@@ -1,0 +1,287 @@
+{% extends 'core/admin/base_admin.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <!-- Main Statistics -->
+    <div class="row mb-4">
+        <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Services</h5>
+                    <h2 class="display-5 display-md-4 count-up">{{ services_count }}</h2>
+                    <p class="card-text">Total services available</p>
+                    <a href="{% url 'admin_service_list' %}" class="btn btn-light btn-sm">Manage Services</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Products</h5>
+                    <h2 class="display-5 display-md-4 count-up">{{ products_count }}</h2>
+                    <p class="card-text">Total products listed</p>
+                    <a href="{% url 'admin_product_list' %}" class="btn btn-light btn-sm">Manage Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Social Media</h5>
+                    <h2 class="display-5 display-md-4 count-up">{{ social_media_count }}</h2>
+                    <p class="card-text">Total social links</p>
+                    <a href="{% url 'admin_social_list' %}" class="btn btn-light btn-sm">Manage Social Media</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <h5 class="card-title">WhatsApp Templates</h5>
+                    <h2 class="display-5 display-md-4 count-up">{{ whatsapp_count }}</h2>
+                    <p class="card-text">Total templates</p>
+                    <a href="{% url 'admin_whatsapp_list' %}" class="btn btn-light btn-sm">Manage Templates</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Profil Admin dan Pengaturan Website -->
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 mb-lg-0">
+        <div class="card h-100">
+            <div class="card-header bg-dark text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-user-circle me-2"></i> Profil Admin</span>
+                    <a href="{% url 'admin_settings' %}" class="btn btn-sm btn-light"><i class="fas fa-edit"></i></a>
+                </div>
+            </div>
+            <div class="card-body text-center">
+                {% if site_settings.admin_photo %}
+                <img src="{{ site_settings.admin_photo.url }}" alt="Admin Photo" class="rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 100px; height: 100px;">
+                    <i class="fas fa-user fa-3x text-white"></i>
+                </div>
+                {% endif %}
+                <h5>{{ site_settings.admin_name }}</h5>
+                {% if site_settings.admin_title %}
+                <p class="text-muted">{{ site_settings.admin_title }}</p>
+                {% endif %}
+                {% if site_settings.admin_description %}
+                <p class="small">{{ site_settings.admin_description|truncatechars:100 }}</p>
+                {% endif %}
+                {% if site_settings.admin_whatsapp %}
+                <a href="https://wa.me/{{ site_settings.admin_whatsapp }}" class="btn btn-success btn-sm" target="_blank">
+                    <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pengaturan Website -->
+    <div class="col-lg-8 col-md-6 col-sm-12">
+        <div class="card h-100">
+            <div class="card-header bg-dark text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-globe me-2"></i> Pengaturan Website</span>
+                    <a href="{% url 'admin_settings' %}" class="btn btn-sm btn-light"><i class="fas fa-edit"></i></a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12 mb-3 mb-md-0">
+                        <h6><i class="fas fa-heading me-2"></i> Judul Website</h6>
+                        <p>{{ site_settings.site_title }}</p>
+                        
+                        <h6><i class="fas fa-align-left me-2"></i> Deskripsi</h6>
+                        <p>{{ site_settings.site_description|default:"Belum diatur"|truncatechars:100 }}</p>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <h6><i class="fas fa-tags me-2"></i> Keywords</h6>
+                        <p>{{ site_settings.site_keywords|default:"Belum diatur"|truncatechars:100 }}</p>
+                        
+                        <h6><i class="fas fa-copyright me-2"></i> Footer Text</h6>
+                        <p>{{ site_settings.footer_text }}</p>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'home' %}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-external-link-alt me-1"></i> Lihat Website
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Akses Cepat -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="fas fa-bolt me-2"></i> Akses Cepat
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'admin_service_list' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
+                            <i class="fas fa-cogs fa-2x mb-2"></i>
+                            <span>Layanan</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'admin_product_list' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
+                            <i class="fas fa-box fa-2x mb-2"></i>
+                            <span>Produk</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'admin_social_list' %}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
+                            <i class="fas fa-share-alt fa-2x mb-2"></i>
+                            <span>Media Sosial</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3 mb-3">
+                        <a href="{% url 'admin_whatsapp_list' %}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-3">
+                            <i class="fab fa-whatsapp fa-2x mb-2"></i>
+                            <span>Template WA</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Panduan Penggunaan -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-book me-2"></i> Panduan Penggunaan</span>
+                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#panduanCollapse" aria-expanded="false" aria-controls="panduanCollapse">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="collapse show" id="panduanCollapse">
+                <div class="card-body">
+                    <h5>Selamat datang di Panel Admin Bio Link!</h5>
+                    <p>Gunakan panel admin ini untuk mengelola konten website Bio Link Anda. Berikut adalah beberapa panduan penggunaan:</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white">
+                                    <i class="fas fa-cogs me-2"></i> Mengelola Layanan
+                                </div>
+                                <div class="card-body">
+                                    <p>Anda dapat menambah, mengedit, dan menghapus layanan yang ditampilkan di website. Pastikan untuk mengisi semua informasi yang diperlukan dan mengatur urutan tampilan.</p>
+                                    <ul class="small">
+                                        <li>Gunakan warna dan gradasi yang menarik</li>
+                                        <li>Tambahkan deskripsi yang jelas</li>
+                                        <li>Atur urutan tampilan sesuai prioritas</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header bg-info text-white">
+                                    <i class="fas fa-share-alt me-2"></i> Mengelola Media Sosial
+                                </div>
+                                <div class="card-body">
+                                    <p>Tambahkan tautan media sosial Anda untuk memudahkan pengunjung menghubungi atau mengikuti Anda di platform media sosial.</p>
+                                    <ul class="small">
+                                        <li>Gunakan ikon yang sesuai dengan platform</li>
+                                        <li>Pastikan link yang dimasukkan valid</li>
+                                        <li>Tambahkan deskripsi untuk informasi tambahan</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-6 col-md-12">
+                            <div class="card mb-3">
+                                <div class="card-header bg-success text-white">
+                                    <i class="fas fa-box me-2"></i> Mengelola Produk
+                                </div>
+                                <div class="card-body">
+                                    <p>Tambahkan produk-produk yang ingin Anda tampilkan di website. Anda dapat mengatur harga, diskon, dan urutan tampilan produk.</p>
+                                    <ul class="small">
+                                        <li>Gunakan gambar dengan kualitas baik</li>
+                                        <li>Tambahkan deskripsi produk yang detail</li>
+                                        <li>Atur harga dan diskon jika ada</li>
+                                        <li>Tambahkan link untuk pembelian atau informasi lebih lanjut</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-3">
+                                <div class="card-header bg-warning text-white">
+                                    <i class="fab fa-whatsapp me-2"></i> Template WhatsApp
+                                </div>
+                                <div class="card-body">
+                                    <p>Buat template pesan WhatsApp untuk memudahkan komunikasi dengan pelanggan atau pengunjung website Anda.</p>
+                                    <ul class="small">
+                                        <li>Buat template yang jelas dan informatif</li>
+                                        <li>Gunakan bahasa yang sopan dan profesional</li>
+                                        <li>Atur urutan template sesuai prioritas penggunaan</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-lightbulb me-2"></i> Tips Tambahan</h6>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <ul class="mb-0">
+                                    <li>Gunakan gambar dengan ukuran yang konsisten untuk tampilan yang lebih baik</li>
+                                    <li>Atur urutan tampilan item sesuai prioritas</li>
+                                    <li>Pastikan semua tautan berfungsi dengan baik</li>
+                                    <li>Gunakan deskripsi yang jelas dan menarik</li>
+                                    <li>Periksa tampilan website secara berkala di perangkat mobile dan desktop</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Script untuk animasi angka statistik
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.display-4');
+        counters.forEach(counter => {
+            const target = parseInt(counter.innerText);
+            let count = 0;
+            const duration = 1000; // ms
+            const increment = target / (duration / 30);
+            
+            const updateCount = () => {
+                if(count < target) {
+                    count += increment;
+                    counter.innerText = Math.floor(count);
+                    setTimeout(updateCount, 30);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            
+            updateCount();
+        });
+    });
+</script>
+{% endblock %}
